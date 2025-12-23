@@ -1,0 +1,7 @@
+transformers
+torch
+streamlit
+requests
+huggingface_hub
+sentence-transformers
+pypdf
