@@ -40,6 +40,3 @@ A fast, lightweight, and modern **Retrieval-Augmented Generation (RAG)** tool th
 
 ## Security Note
 This project uses a `.gitignore` to ensure your `secrets.toml` file is never pushed to public repositories. When deploying to Streamlit Cloud, remember to paste your `HF_TOKEN` into the app's secret management dashboard.
-
----
-*Built with ❤️ for the AI community.*
