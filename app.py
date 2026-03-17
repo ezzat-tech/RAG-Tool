@@ -15,7 +15,7 @@ def query_qa_api(question, context):
     ]
     
     return client.chat.completions.create(
-        model="meta-llama/Llama-3.2-3B-Instruct",
+        model="Qwen/Qwen2.5-72B-Instruct",
         messages=messages,
         max_tokens=300,
         temperature=0.1
