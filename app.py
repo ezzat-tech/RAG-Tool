@@ -1,6 +1,6 @@
 import streamlit as st
 from huggingface_hub import InferenceClient
-from sentence_transformers import util
+import numpy as np
 from pypdf import PdfReader
 
 # --- CONFIGURATION ---
@@ -90,15 +90,28 @@ if uploaded_file is not None:
 
             bge_prefix = "Represent this sentence for searching relevant passages: "
             question_embedding = get_embeddings(bge_prefix + question)
-            # Step 3: Mathematical Search
-            hits = util.semantic_search(question_embedding, para_embeddings, top_k=3)
+            # Step 3: Mathematical Search (Cosine Similarity using Numpy)
+            q_emb = np.array(question_embedding)
+            if q_emb.ndim == 1:
+                q_emb = q_emb.reshape(1, -1)
+            p_emb = np.array(para_embeddings)
+            
+            # Normalize the vectors
+            q_norm = q_emb / np.linalg.norm(q_emb, axis=1, keepdims=True)
+            p_norm = p_emb / np.linalg.norm(p_emb, axis=1, keepdims=True)
+            
+            # Compute similarities
+            similarities = np.dot(q_norm, p_norm.T)[0]
+            
+            # Get top 3 indices
+            top_k = min(3, len(similarities))
+            top_k_indices = np.argsort(similarities)[::-1][:top_k]
 
             best_context = ""
-            for hit in hits[0]:
-                index = hit["corpus_id"]
+            for index in top_k_indices:
                 best_context += paragraphs[index] + "\n\n"
 
-            best_score = hits[0][0]["score"]
+            best_score = similarities[top_k_indices[0]]
 
             if best_score < 0.35:
                 st.warning("Could not find any relevant information in the document.")
