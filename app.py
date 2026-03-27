@@ -2,9 +2,23 @@ import streamlit as st
 from huggingface_hub import InferenceClient
 import numpy as np
 from pypdf import PdfReader
+import os
 
 # --- CONFIGURATION ---
-HF_TOKEN = st.secrets["HF_TOKEN"]
+HF_TOKEN = os.getenv("HF_TOKEN")
+if not HF_TOKEN:
+    try:
+        HF_TOKEN = st.secrets["HF_TOKEN"]
+    except Exception:
+        HF_TOKEN = None
+
+if not HF_TOKEN:
+    st.error(
+        "HF_TOKEN is not configured. Set it as an environment variable "
+        "(recommended for Render) or in .streamlit/secrets.toml."
+    )
+    st.stop()
+
 client = InferenceClient(api_key=HF_TOKEN)
 
 def query_qa_api(question, context):
